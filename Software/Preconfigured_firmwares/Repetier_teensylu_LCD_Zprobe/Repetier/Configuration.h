@@ -295,7 +295,7 @@ WARNING: Servos can draw a considerable amount of current. Make sure your system
 
 #define FEATURE_Z_PROBE 1
 #define Z_PROBE_BED_DISTANCE 10
-#define Z_PROBE_PIN 37  // A bit of a guess, but printrboard uses this for E-Stop and that board is based on Teensylu
+#define Z_PROBE_PIN 25  // A bit of a guess from Hugo. Printrboard uses 37 for E-Stop and that board is based on Teensylu though.
 #define Z_PROBE_PULLUP 1
 #define Z_PROBE_ON_HIGH 1
 #define Z_PROBE_X_OFFSET -10
