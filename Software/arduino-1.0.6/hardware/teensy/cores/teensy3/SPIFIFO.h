@@ -3,178 +3,28 @@
 
 #include "avr_emulation.h"
 
-#ifdef KINETISK
 
-#if F_BUS == 120000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(3) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(120 / 5) * ((1+1)/2)
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(2))                //(120 / 2) * ((1+0)/4) = 15 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(3) | SPI_CTAR_BR(0))                //(120 / 5) * ((1+0)/2)
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(120 / 5) * ((1+1)/6)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(2))                //(120 / 5) * ((1+0)/4)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(4)) 		    //(120 / 5) * ((1+0)/6)
+#if F_BUS == 48000000
 
-#elif F_BUS == 108000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(3) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(108 / 5) * ((1+1)/2) = 21.6 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(2))                //(108 / 2) * ((1+0)/4) = 13.5 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(108 / 3) * ((1+1)/6)
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(108 / 5) * ((1+1)/6) = 7.2 MHz
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(4))                //(108 / 3) * ((1+0)/6) 
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(5) | SPI_CTAR_BR(2)) 		    //(108 / 7) * ((1+0)/4) = 3.86 MHz
-
-#elif F_BUS == 96000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(96 / 2) * ((1+0)/2)
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(96 / 2) * ((1+1)/6)
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(6) | SPI_CTAR_DBR) //(96 / 2) * ((1+1)/8)
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(2))                //(96 / 3) * ((1+0)/4)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(6))                //(96 / 2) * ((1+0)/8)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(6)) 		    //(96 / 3) * ((1+0)/8)
-
-#elif F_BUS == 90000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(90 / 2) * ((1+0)/2) = 22.5 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(90 / 2) * ((1+1)/6) = 15 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(6) | SPI_CTAR_DBR) //(90 / 2) * ((1+1)/8) = 11.25 MHz
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(4))                //(90 / 2) * ((1+0)/6) = 7.5 MHz
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(90 / 5) * ((1+1)/6)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(6)) 		    //(90 / 3) * ((1+0)/8) = 3.75 MHz
-
-#elif F_BUS == 80000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(80 / 2) * ((1+0)/2) = 20 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(3) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(80 / 5) * ((1+1)/2)
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(5) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(80 / 7) * ((1+1)/2) = 11.42 MHz
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(0))                //(80 / 5) * ((1+0)/2)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(5) | SPI_CTAR_BR(0))                //(80 / 7) * ((1+0)/2) = 5.7 MHz
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(2)) 		    //(80 / 5) * ((1+0)/4)
-
-#elif F_BUS == 72000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(72 / 3) * ((1+1)/2)
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(72 / 2) * ((1+1)/6) = 12 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(72 / 2) * ((1+1)/6)
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(4) | SPI_CTAR_DBR) //(72 / 3) * ((1+1)/6)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(4))                //(72 / 2) * ((1+0)/6)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(4)) 		    //(72 / 3) * ((1+0)/6)
-
-#elif F_BUS == 64000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(64 / 3) * ((1+1)/2) = 21.3 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(64 / 2) * ((1+0)/2)
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0)) 		    //(64 / 3) * ((1+0)/2) = 10.67 MHz
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(2))                //(64 / 2) * ((1+0)/4)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(4))                //(64 / 2) * ((1+0)/6) = 5.3 MHz
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(6)) 		    //(64 / 2) * ((1+0)/8)
-
-#elif F_BUS == 60000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(60 / 3) * ((1+1)/2) = 20 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(60 / 2) * ((1+0)/2) = 15 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(2) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(60 / 5) * ((1+1)/2)
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1))                //(60 / 2) * ((1+0)/4) = 7.5 MHz
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(2) | SPI_CTAR_BR(0))                //(60 / 5) * ((1+0)/2)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(2) | SPI_CTAR_BR(2) | SPI_CTAR_DBR) //(60 / 5) * ((1+1)/6)
-
-#elif F_BUS == 56000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(56 / 3) * ((1+1)/2) = 18.67
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(56 / 2) * ((1+0)/2) = 14
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(2) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(56 / 5) * ((1+1)/2) = 11.2
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(56 / 7) * ((1+1)/2)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(2) | SPI_CTAR_BR(0))                //(56 / 5) * ((1+0)/2)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(0))                //(56 / 7) * ((1+0)/2)
-
-#elif F_BUS == 48000000
 #define HAS_SPIFIFO
 #define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(48 / 2) * ((1+1)/2)
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(48 / 3) * ((1+1)/2)
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(48 / 2) * ((1+0)/2)
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(2) | SPI_CTAR_DBR) //(48 / 2) * ((1+1)/6)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1))                //(48 / 2) * ((1+0)/4)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(2))                //(48 / 2) * ((1+0)/6)
-
-#elif F_BUS == 40000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(40 / 2) * ((1+1)/2) = 20
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(40 / 3) * ((1+1)/2) = 13.33
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(40 / 2) * ((1+0)/2) = 10
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(2) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(40 / 5) * ((1+1)/2)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(3) | SPI_CTAR_BR(1) | SPI_CTAR_DBR) //(40 / 7) * ((1+1)/2) = 5.71
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(2) | SPI_CTAR_BR(1))                //(40 / 5) * ((1+0)/2)
-
-#elif F_BUS == 36000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(36 / 2) * ((1+1)/2) = 18
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(36 / 3) * ((1+1)/2) = 12
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(36 / 3) * ((1+1)/2) = 12
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(2) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(36 / 5) * ((1+1)/2) = 7.2
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(2) | SPI_CTAR_DBR) //(36 / 2) * ((1+1)/6)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(2) | SPI_CTAR_DBR) //(36 / 3) * ((1+1)/6)
+#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(48 / 3) * ((1+1)/2)  33% duty cycle
+#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0)) //(48 / 2) * ((1+0)/2)
+#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0)) //(48 / 3) * ((1+0)/2)
+#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1)) //(48 / 2) * ((1+0)/4)
+#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(1)) //(48 / 3) * ((1+0)/4)
 
 #elif F_BUS == 24000000
+
 #define HAS_SPIFIFO
 #define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(24 / 2) * ((1+1)/2)  12 MHz
 #define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(24 / 2) * ((1+1)/2)  12 MHz
 #define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(24 / 2) * ((1+1)/2)
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(24 / 3) * ((1+1)/2)
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0))                //(24 / 2) * ((1+0)/2)
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(2) | SPI_CTAR_DBR) //(24 / 2) * ((1+1)/6)
+#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(24 / 3) * ((1+1)/2)  33% duty cycle
+#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0)) //(24 / 2) * ((1+0)/2)
+#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(1) | SPI_CTAR_BR(0)) //(24 / 3) * ((1+0)/2)
 
-#elif F_BUS == 16000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(3) | SPI_CTAR_DBR) //(16 / 2) * ((1+1)/8) = 2 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(3) | SPI_CTAR_DBR) //(16 / 2) * ((1+1)/8) = 2 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(3) | SPI_CTAR_DBR) //(16 / 2) * ((1+1)/8) = 2 MHz
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(3) | SPI_CTAR_DBR) //(16 / 2) * ((1+1)/8) = 2 MHz
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(3) | SPI_CTAR_DBR) //(16 / 2) * ((1+1)/8) = 2 MHz
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(3) | SPI_CTAR_DBR) //(16 / 2) * ((1+1)/8) = 2 MHz
-
-#elif F_BUS == 8000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1) | SPI_CTAR_DBR) //(8 / 2) * ((1+1)/4) = 2 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1) | SPI_CTAR_DBR) //(8 / 2) * ((1+1)/4) = 2 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1) | SPI_CTAR_DBR) //(8 / 2) * ((1+1)/4) = 2 MHz
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1) | SPI_CTAR_DBR) //(8 / 2) * ((1+1)/4) = 2 MHz
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1) | SPI_CTAR_DBR) //(8 / 2) * ((1+1)/4) = 2 MHz
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(1) | SPI_CTAR_DBR) //(8 / 2) * ((1+1)/4) = 2 MHz
-
-#elif F_BUS == 4000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 2 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 2 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 2 MHz
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 2 MHz
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 2 MHz
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 2 MHz
-
-#elif F_BUS == 2000000
-#define HAS_SPIFIFO
-#define SPI_CLOCK_24MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 1 MHz
-#define SPI_CLOCK_16MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 1 MHz
-#define SPI_CLOCK_12MHz   (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 1 MHz
-#define SPI_CLOCK_8MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 1 MHz
-#define SPI_CLOCK_6MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 1 MHz
-#define SPI_CLOCK_4MHz    (SPI_CTAR_PBR(0) | SPI_CTAR_BR(0) | SPI_CTAR_DBR) //(4 / 2) * ((1+1)/2) = 1 MHz
-
-#endif // F_BUS
-
-#endif // KINETISK
-
-/*
-#! /usr/bin/perl
-$clock = 60;
-for $i (2, 3, 5, 7) {
-        for $j (0, 1) {
-                for $k (2, 4, 6, 8, 16, 32) {
-                        $out = $clock / $i * (1 + $j) / $k;
-                        printf "%0.2f :  ", $out;
-                        print "$clock / $i * (1 + $j) / $k = $out\n";
-                }
-        }
-}
-*/
+#endif
 
 // sck = F_BUS / PBR * ((1+DBR)/BR)
 //  PBR = 2, 3, 5, 7
@@ -200,7 +50,7 @@ public:
 		uint32_t p, ctar = speed;
 		SIM_SCGC6 |= SIM_SCGC6_SPI0;
 
-		KINETISK_SPI0.MCR = SPI_MCR_MSTR | SPI_MCR_MDIS | SPI_MCR_HALT | SPI_MCR_PCSIS(0x1F);
+		SPI0.MCR = SPI_MCR_MSTR | SPI_MCR_MDIS | SPI_MCR_HALT | SPI_MCR_PCSIS(0x1F);
 		if (mode & 0x08) ctar |= SPI_CTAR_CPOL;
 		if (mode & 0x04) {
 			ctar |= SPI_CTAR_CPHA;
@@ -208,8 +58,8 @@ public:
 		} else {
 			ctar |= (ctar & 0x0F) << 12;
 		}
-		KINETISK_SPI0.CTAR0 = ctar | SPI_CTAR_FMSZ(7);
-		KINETISK_SPI0.CTAR1 = ctar | SPI_CTAR_FMSZ(15);
+		SPI0.CTAR0 = ctar | SPI_CTAR_FMSZ(7);
+		SPI0.CTAR1 = ctar | SPI_CTAR_FMSZ(15);
 		if (pin == 10) {         // PTC4
 			CORE_PIN10_CONFIG = PORT_PCR_MUX(2);
 			p = 0x01;
@@ -239,8 +89,8 @@ public:
 			p = 0x10;
 		} else {
 			reg = portOutputRegister(pin);
-			pinMode(pin, OUTPUT);
 			*reg = 1;
+			pinMode(pin, OUTPUT);
 			p = 0;
 		}
 		pcs = p;
@@ -250,16 +100,16 @@ public:
 	inline void write(uint32_t b, uint32_t cont=0) __attribute__((always_inline)) {
 		uint32_t pcsbits = pcs << 16;
 		if (pcsbits) {
-			KINETISK_SPI0.PUSHR = (b & 0xFF) | pcsbits | (cont ? SPI_PUSHR_CONT : 0);
-			while (((KINETISK_SPI0.SR) & (15 << 12)) > (3 << 12)) ; // wait if FIFO full
+			SPI0.PUSHR = (b & 0xFF) | pcsbits | (cont ? SPI_PUSHR_CONT : 0);
+			while (((SPI0.SR) & (15 << 12)) > (3 << 12)) ; // wait if FIFO full
 		} else {
 			*reg = 0;
-			KINETISK_SPI0.SR = SPI_SR_EOQF;
-			KINETISK_SPI0.PUSHR = (b & 0xFF) | (cont ? 0 : SPI_PUSHR_EOQ);
+			SPI0.SR = SPI_SR_EOQF;
+			SPI0.PUSHR = (b & 0xFF) | (cont ? 0 : SPI_PUSHR_EOQ);
 			if (cont) {
-				while (((KINETISK_SPI0.SR) & (15 << 12)) > (3 << 12)) ;
+				while (((SPI0.SR) & (15 << 12)) > (3 << 12)) ;
 			} else {
-				while (!(KINETISK_SPI0.SR & SPI_SR_EOQF)) ;
+				while (!(SPI0.SR & SPI_SR_EOQF)) ;
 				*reg = 1;
 			}
 		}
@@ -267,27 +117,27 @@ public:
 	inline void write16(uint32_t b, uint32_t cont=0) __attribute__((always_inline)) {
 		uint32_t pcsbits = pcs << 16;
 		if (pcsbits) {
-			KINETISK_SPI0.PUSHR = (b & 0xFFFF) | (pcs << 16) |
+			SPI0.PUSHR = (b & 0xFFFF) | (pcs << 16) |
 				(cont ? SPI_PUSHR_CONT : 0) | SPI_PUSHR_CTAS(1);
-			while (((KINETISK_SPI0.SR) & (15 << 12)) > (3 << 12)) ;
+			while (((SPI0.SR) & (15 << 12)) > (3 << 12)) ;
 		} else {
 			*reg = 0;
-			KINETISK_SPI0.SR = SPI_SR_EOQF;
-			KINETISK_SPI0.PUSHR = (b & 0xFFFF) | (cont ? 0 : SPI_PUSHR_EOQ) | SPI_PUSHR_CTAS(1);
+			SPI0.SR = SPI_SR_EOQF;
+			SPI0.PUSHR = (b & 0xFFFF) | (cont ? 0 : SPI_PUSHR_EOQ) | SPI_PUSHR_CTAS(1);
 			if (cont) {
-				while (((KINETISK_SPI0.SR) & (15 << 12)) > (3 << 12)) ;
+				while (((SPI0.SR) & (15 << 12)) > (3 << 12)) ;
 			} else {
-				while (!(KINETISK_SPI0.SR & SPI_SR_EOQF)) ;
+				while (!(SPI0.SR & SPI_SR_EOQF)) ;
 				*reg = 1;
 			}
 		}
 	}
 	inline uint32_t read(void) __attribute__((always_inline)) {
-		while ((KINETISK_SPI0.SR & (15 << 4)) == 0) ;  // TODO, could wait forever
-		return KINETISK_SPI0.POPR;
+		while ((SPI0.SR & (15 << 4)) == 0) ;  // TODO, could wait forever
+		return SPI0.POPR;
 	}
 	inline void clear(void) __attribute__((always_inline)) {
-		KINETISK_SPI0.MCR = SPI_MCR_MSTR | SPI_MCR_PCSIS(0x1F) | SPI_MCR_CLR_TXF | SPI_MCR_CLR_RXF;
+		SPI0.MCR = SPI_MCR_MSTR | SPI_MCR_PCSIS(0x1F) | SPI_MCR_CLR_TXF | SPI_MCR_CLR_RXF;
 	}
 private:
 	static uint8_t pcs;
@@ -295,6 +145,5 @@ private:
 };
 extern SPIFIFOclass SPIFIFO;
 
-#endif // HAS_SPIFIFO
-
+#endif
 #endif

@@ -1662,17 +1662,10 @@ static void disable_peripherals(void)
 	#endif
 }
 
-#ifndef WDFR
-#define WDFR 3
-#endif
 
 void _reboot_Teensyduino_(void)
 {
 	cli();
-	// stop watchdog timer, if running
-	MCUSR &= ~(1<<WDFR);
-	WDTCSR |= (1<<WDCE);
-	WDTCSR = 0;
 	delayMicroseconds(5000);
 	UDCON = 1;
 	USBCON = (1<<FRZCLK);

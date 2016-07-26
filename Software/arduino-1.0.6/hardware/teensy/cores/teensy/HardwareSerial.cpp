@@ -25,7 +25,6 @@
 #include <avr/interrupt.h>
 #include "core_pins.h"
 #include "HardwareSerial.h"
-#include "wiring_private.h" 
 
 #define RX_BUFFER_SIZE 64
 static volatile uint8_t rx_buffer[RX_BUFFER_SIZE];
@@ -74,14 +73,6 @@ void HardwareSerial::end(void)
 	rx_buffer_tail = 0;
 }
 
-void HardwareSerial::transmitterEnable(uint8_t pin)
-{
-	while (transmitting) ;
-	pinMode(pin, OUTPUT);
-	digitalWrite(pin, LOW);
-	tx_enable_pin = pin;
-}
-
 int HardwareSerial::available(void)
 {
 	uint8_t head, tail;
@@ -90,16 +81,6 @@ int HardwareSerial::available(void)
 	tail = rx_buffer_tail;
 	if (head >= tail) return head - tail;
 	return RX_BUFFER_SIZE + head - tail;
-}
-
-int HardwareSerial::availableForWrite(void)
-{
-	uint8_t head, tail;
-
-	head = rx_buffer_head;
-	tail = rx_buffer_tail;
-	if (head >= tail) return TX_BUFFER_SIZE - 1 - head + tail;
-	return tail - head - 1;
 }
 
 int HardwareSerial::peek(void)
@@ -146,7 +127,6 @@ void HardwareSerial::write(uint8_t c)
 #endif
 {
 	uint8_t i;
-	uint8_t status;
 
 	if (!(UCSR1B & (1<<TXEN1))) {
 #if ARDUINO >= 100
@@ -159,28 +139,13 @@ void HardwareSerial::write(uint8_t c)
 	if (tx_enable_pin < 255 && !transmitting) {
 		digitalWrite(tx_enable_pin, HIGH);
 	}
-	// If the buffer and the data register is empty, just write the byte
-	// to the data register and be done. This shortcut helps
-	// significantly improve the effective datarate at high (>
-	// 500kbit/s) bitrates, where interrupt overhead becomes a slowdown.
-	if ((tx_buffer_head == tx_buffer_tail) && (UCSR1A & (1<<UDRE1))) {
-		status = SREG;
-		cli();
-		UDR1 = c;
-		transmitting = 1;
-		SREG = status;
-		return 1;
-	}
-
 	i = tx_buffer_head + 1;
 	if (i >= TX_BUFFER_SIZE) i = 0;
 	while (tx_buffer_tail == i) ; // wait until space in buffer
 	tx_buffer[i] = c;
 	transmitting = 1;
 	tx_buffer_head = i;
-	//UCSR1B = (1<<RXEN1) | (1<<TXCIE1) | (1<<TXEN1) | (1<<RXCIE1) | (1<<UDRIE1);
-	sbi(UCSR1B, UDRIE1);
-
+	UCSR1B = (1<<RXEN1) | (1<<TXCIE1) | (1<<TXEN1) | (1<<RXCIE1) | (1<<UDRIE1);
 #if ARDUINO >= 100
 	return 1;
 #endif
@@ -205,8 +170,7 @@ ISR(USART1_UDRE_vect)
 
 	if (tx_buffer_head == tx_buffer_tail) {
 		// buffer is empty, disable transmit interrupt
-		//UCSR1B = (1<<RXEN1) | (1<<TXCIE1) | (1<<TXEN1) | (1<<RXCIE1);
-		cbi(UCSR1B, UDRIE1);
+		UCSR1B = (1<<RXEN1) | (1<<TXCIE1) | (1<<TXEN1) | (1<<RXCIE1);
 	} else {
 		i = tx_buffer_tail + 1;
 		if (i >= TX_BUFFER_SIZE) i = 0;

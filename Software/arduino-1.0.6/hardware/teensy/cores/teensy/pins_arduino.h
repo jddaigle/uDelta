@@ -148,11 +148,4 @@ static inline uint8_t digitalPinToTimer(uint8_t pin)
 	}
 }
 
-#define SERIAL_PORT_MONITOR             Serial
-#define SERIAL_PORT_USBVIRTUAL          Serial
-#define SERIAL_PORT_HARDWARE            Serial1
-#define SERIAL_PORT_HARDWARE_OPEN       Serial1
-
-#define SerialUSB			Serial
-
 #endif
