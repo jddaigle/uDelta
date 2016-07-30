@@ -201,7 +201,7 @@
 #define DELTA_SEGMENTS_PER_SECOND_MOVE 70 // Less accurate setting for other moves
 
 // Delta settings
-#define DELTA_DIAGONAL_ROD 148 // mm
+#define DELTA_DIAGONAL_ROD 147 // mm
 #define DELTA_ALPHA_A 210
 #define DELTA_ALPHA_B 330
 #define DELTA_ALPHA_C 90
@@ -293,28 +293,30 @@ WARNING: Servos can draw a considerable amount of current. Make sure your system
 
 // #################### Z-Probing #####################
 
-#define FEATURE_Z_PROBE 1
-#define Z_PROBE_BED_DISTANCE 10
+#define FEATURE_Z_PROBE true
 #define Z_PROBE_PIN 25  // A bit of a guess from Hugo. Printrboard uses 37 for E-Stop and that board is based on Teensylu though.
-#define Z_PROBE_PULLUP 1
-#define Z_PROBE_ON_HIGH 1
-#define Z_PROBE_X_OFFSET -10
-#define Z_PROBE_Y_OFFSET -10
+#define Z_PROBE_PULLUP true
+#define Z_PROBE_ON_HIGH false
+#define Z_PROBE_X_OFFSET -15
+#define Z_PROBE_Y_OFFSET 17
 #define Z_PROBE_WAIT_BEFORE_TEST 0
-#define Z_PROBE_SPEED 2
-#define Z_PROBE_XY_SPEED 150
-#define Z_PROBE_SWITCHING_DISTANCE 1.5
-#define Z_PROBE_REPETITIONS 3
-#define Z_PROBE_HEIGHT 10
+#define Z_PROBE_SPEED 10
+#define Z_PROBE_XY_SPEED 50
+#define Z_PROBE_SWITCHING_DISTANCE 1
+#define Z_PROBE_REPETITIONS 1
+#define Z_PROBE_HEIGHT 6.5
+#define Z_PROBE_GAP 0
 #define Z_PROBE_START_SCRIPT ""
 #define Z_PROBE_FINISHED_SCRIPT ""
-#define FEATURE_AUTOLEVEL 0
-#define Z_PROBE_X1 20
-#define Z_PROBE_Y1 20
-#define Z_PROBE_X2 160
-#define Z_PROBE_Y2 20
-#define Z_PROBE_X3 100
-#define Z_PROBE_Y3 160
+#define FEATURE_AUTOLEVEL 1
+#define Z_PROBE_X1 43
+#define Z_PROBE_Y1 -25
+#define Z_PROBE_X2 0
+#define Z_PROBE_Y2 55
+#define Z_PROBE_X3 -43
+#define Z_PROBE_Y3 -25
+#define BED_LEVELING_METHOD 1
+#define BED_CORRECTION_METHOD 0
 
 #ifndef SDSUPPORT  // Some boards have sd support on board. These define the values already in pins.h
 #define SDSUPPORT 1
@@ -332,8 +334,8 @@ WARNING: Servos can draw a considerable amount of current. Make sure your system
 #define FEATURE_CONTROLLER 2
 
 #define UI_LANGUAGE 0 //1000
-#define UI_PRINTER_NAME "    Micro  Delta     "
-#define UI_PRINTER_COMPANY "     by eMotion Tech"
+#define UI_PRINTER_NAME "uDelta"
+#define UI_PRINTER_COMPANY "by eMotion Tech"
 #define UI_PAGES_DURATION 4000
 #define UI_ANIMATION 0
 #define UI_SPEEDDEPENDENT_POSITIONING 0
