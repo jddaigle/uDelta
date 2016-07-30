@@ -293,21 +293,26 @@ WARNING: Servos can draw a considerable amount of current. Make sure your system
 
 // #################### Z-Probing #####################
 
-#define FEATURE_Z_PROBE true
-#define Z_PROBE_PIN 25  // A bit of a guess from Hugo. Printrboard uses 37 for E-Stop and that board is based on Teensylu though.
-#define Z_PROBE_PULLUP true
-#define Z_PROBE_ON_HIGH false
-#define Z_PROBE_X_OFFSET -15
-#define Z_PROBE_Y_OFFSET 17
+#define Z_PROBE_Z_OFFSET 0
+#define Z_PROBE_Z_OFFSET_MODE 1
+#define UI_BED_COATING 1
+#define FEATURE_Z_PROBE 1
+#define Z_PROBE_BED_DISTANCE 10
+#define Z_PROBE_PIN 25  // Thanks to Hugo F on eMotion Tech for his quialified quess and quick answers
+#define Z_PROBE_PULLUP 1
+#define Z_PROBE_ON_HIGH 0
+#define Z_PROBE_X_OFFSET 0
+#define Z_PROBE_Y_OFFSET 0
 #define Z_PROBE_WAIT_BEFORE_TEST 0
-#define Z_PROBE_SPEED 10
-#define Z_PROBE_XY_SPEED 50
+#define Z_PROBE_SPEED 3
+#define Z_PROBE_XY_SPEED 150
 #define Z_PROBE_SWITCHING_DISTANCE 1
 #define Z_PROBE_REPETITIONS 1
-#define Z_PROBE_HEIGHT 6.5
-#define Z_PROBE_GAP 0
+#define Z_PROBE_HEIGHT 10
 #define Z_PROBE_START_SCRIPT ""
 #define Z_PROBE_FINISHED_SCRIPT ""
+#define Z_PROBE_REQUIRES_HEATING 0
+#define Z_PROBE_MIN_TEMPERATURE 150
 #define FEATURE_AUTOLEVEL 1
 #define Z_PROBE_X1 43
 #define Z_PROBE_Y1 -25
@@ -317,6 +322,21 @@ WARNING: Servos can draw a considerable amount of current. Make sure your system
 #define Z_PROBE_Y3 -25
 #define BED_LEVELING_METHOD 1
 #define BED_CORRECTION_METHOD 0
+#define BED_LEVELING_GRID_SIZE 5
+#define BED_LEVELING_REPETITIONS 5
+#define BED_MOTOR_1_X 0
+#define BED_MOTOR_1_Y 0
+#define BED_MOTOR_2_X 200
+#define BED_MOTOR_2_Y 0
+#define BED_MOTOR_3_X 100
+#define BED_MOTOR_3_Y 200
+#define BENDING_CORRECTION_A 0
+#define BENDING_CORRECTION_B 0
+#define BENDING_CORRECTION_C 0
+#define FEATURE_AXISCOMP 1
+#define AXISCOMP_TANXY 0
+#define AXISCOMP_TANYZ 0
+#define AXISCOMP_TANXZ 0
 
 #ifndef SDSUPPORT  // Some boards have sd support on board. These define the values already in pins.h
 #define SDSUPPORT 1
